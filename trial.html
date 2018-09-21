@@ -1,0 +1,1090 @@
+<html>
+	<head>
+		<title>
+			Kerala Floods
+		</title>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.1.0/d3.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.13/jquery.mousewheel.js"></script>
+		<link href="https://fonts.googleapis.com/css?family=Roboto:700,300,400" rel="stylesheet">
+		<style>
+			#yaxis>svg>g{
+				/*transform:translateX(10%); */
+			}
+			#chart{
+				/*background:#eeeeee;*/
+				position: relative;
+				overflow: auto;
+    			white-space: nowrap;
+    			left: 10vw;	
+    			z-index: 2;
+			}
+			.bar{
+				display:inline-block;
+				z-index: 1;
+				background:#2196f3;
+				margin-right:2px;
+				
+				transform:translateY(1px); 
+			}
+			.bar2{
+				display: inline-block;
+				z-index: 1;
+				background-image:linear-gradient(180deg, #FFC107, #ffff0000);
+				margin-right:2px;
+				transition:height 0.4s ease-in-out;
+				transform:translateY(1px); 
+			}
+			.bar3{
+				position: absolute;
+				z-index: 1;
+				background:hsl(25, 90%, 54%);
+				margin-right:2px;
+				
+				transform:translateY(-100%); 
+			}
+
+
+			body{
+				overflow:hidden; 
+				background:#eeeeee;
+				margin: 0px;
+			}
+			#chart>.bar{
+				position: relative;
+				top:80.4%;
+			}
+			.dam{
+				position: absolute;
+				bottom:09%;
+			}
+			.ghostDam{
+				position: absolute;
+				bottom:09%;
+			}
+			.bar0{
+				display: inline-block;
+				z-index: 1;
+				border-top: solid 1px #ff000000;
+			    border-left: solid 1px #ff000000;
+			    border-right: solid 1px #ff000000;
+			    background-image:linear-gradient(180deg, #dadad5, #ffff0000);
+			    margin-right: 2px;
+				transition:height 0.4s ease-in-out;
+				transform:translateY(1px); 
+			}
+			#yaxis{
+				
+				position: absolute;
+				
+				
+			}
+			#yaxis>svg>g>path,#yaxis>svg>g>g>line{
+				stroke: #757575;
+			}
+			#yaxis>svg>g>g>text{
+				fill:#757575;
+			}
+			
+			.x-axis-mon>path,.x-axis-mon>.tick>line{
+				stroke: rgba(0,0,0,0);
+			}
+			.x-axis-mon>.tick>text{
+				font-family: 'Roboto', sans-serif;
+				font-weight: 300;
+				font-size: 0.9vh;
+			}
+			.x-axis-day>.tick>text{
+				font-family: 'Roboto', sans-serif;
+				font-weight: 700;
+				font-size: 1vh;
+				fill:#757575;
+			}
+			.x-axis-day>path,.x-axis-day>.tick>line{
+				stroke:#757575;
+			}
+			#levels{
+				position: absolute;
+				font-size: 10px;
+				text-align: center;
+				font-family: 'Roboto', sans-serif;
+				width:100%;
+				transition:all 0.3s ease-in;
+				top: 50%;
+				transform: translateY(-50%); 
+				color: #757575;
+			}
+			.circle{
+				transition:all 0.3s cubic-bezier(0.7, 0.01, 0.09, 1.04);
+				opacity: 0.5;
+			}
+			 .slider {
+			 	position: absolute;
+			 	top:0%;
+	            -webkit-appearance: none;
+	            width: 200%;
+	            height: 15px;
+	            border-radius: 5px;   
+	            background: #d3d3d373;
+	            outline: none;
+	            opacity: 0.7;
+	            -webkit-transition: .2s;
+	            transition: opacity .2s;
+	            transform:rotate(-90deg) translate(-36%, -119%);
+	            z-index: 2;
+	        }
+
+	        .slider::-webkit-slider-thumb {
+	            -webkit-appearance: none;
+	            appearance: none;
+	            width: 8%;
+	            height: 150%;
+	            border-radius: 20%; 
+	            background: #4CAF50;
+	            cursor: pointer;
+	        }
+
+	        .slider::-moz-range-thumb {
+	            width: 25px;
+	            height: 25px;
+	            border-radius: 50%;
+	            background: #4CAF50;
+	            cursor: pointer;
+	        }
+	        #demo{
+	        	position: absolute;
+	        	width: 100%;
+			    text-align: center;
+			    font-family: 'Roboto', sans-serif;
+			    font-weight: 400;
+			    color: #757575;
+			    z-index: 1;
+			    font-size: 1vh;
+	        }
+	        .spillVal{
+	        	width:100%;
+				top:0;
+	        	position:absolute;
+	        }
+	        .value{
+	        	display:inline-block;
+	        	width:100%;
+	        	font-family: 'Roboto', sans-serif;
+	        	margin-right: 2px;
+	        	text-align: center;
+	        	font-size: 0.6em;
+	        	color: #BDBDBD;
+	        }
+	        ::-webkit-scrollbar {
+				display: none;
+				}
+	        /*container*/
+	        .container{
+	     		width: 50vw;
+			    height: 9vh;
+			    top: 0;
+			    right: 0;
+			    position: absolute;
+	        }
+	        .userValues{
+	        	position: absolute;
+	        	right:0;
+	        	top:100%;
+	        	width:100%;
+	        	transform:translateY(-100%);
+	        	font-family: 'Roboto', sans-serif;
+	        	font-weight: 400;
+	        	color: #9E9E9E;
+	        }
+	        .btn {
+			    border: none;
+			    background-color: white;
+			    padding: 14px 28px;
+			    font-size: 16px;
+			    cursor: pointer;
+			    display: inline-block;
+			}
+			.elem{
+				float:left;
+				margin-right:0.5vw;
+				height: 100%;
+			}
+			.elem>p{
+				font-size: 0.8em;
+				height: 1vh;
+				margin-top: 0;
+				position: relative;
+				margin-bottom: 0.8vh;
+			}
+			.elem>input{
+			    height: 3vh;
+			    font-family: 'Roboto', sans-serif;
+			    font-weight: 700;
+			    font-size: 1.5em;
+			    border: solid 0.1vw #ffffff24;
+			    color: #9E9E9E;
+			    background: #E0E0E0;
+			    width: 100%;
+			}
+			button.elem{
+			    color: #757575;
+			    font-family: 'Roboto', sans-serif;
+			    font-weight: 300;
+			    border-radius: 5px;
+			    width: 12%;
+			    height: 3vh;
+			    margin-top: 1.8vh;
+			    font-size: 1vh;
+			    padding: 1vh;
+			    background: #8bc34aa1;
+			}
+			.elem.one,.elem.two, .elem.three{
+				width:27%;
+			}
+
+
+			/*visual*/
+			.visual{
+				width:100%;
+				height:38vh;
+				position: absolute;
+				bottom: 0;
+			}
+			.sky{
+				height:85%;
+				width:100%;
+				background-image:linear-gradient(180deg, #03a9f408, #9FA8DA);
+				position: relative;
+    			
+			}
+			.ground{
+				height:15vh;
+				width:100%;
+				background: #b9854fd9;
+				position: relative;
+    			bottom: 0;
+			}
+			.dam_{
+				width: 40%;
+			    background-image: url("dam.png");
+			    height: 100%;
+			    background-size: contain;
+			    background-position: right bottom;
+			    left: 0%;
+			    position: absolute;
+			    background-repeat: no-repeat;
+			}
+			.city{
+				width: 60%;
+			    background-image: url("zoom.png");
+			    height: 100%;
+			    background-size: contain;
+			    background-position:right bottom;
+			   	right: 0%;
+			    position: absolute;
+			    background-repeat: no-repeat;
+			    
+			}
+			.water_dam{
+				position: absolute;
+				width: 40%;
+				height: 100%;
+				left: 0;
+				bottom: 0;
+			}
+			.in_dam{
+				position: absolute;
+				width:53%;
+				height:80%;
+				background: #039be58c; 
+				bottom: 0;
+				transition: all 0.4s ease-in-out;
+			}
+			.on_ground{
+				position: absolute;
+				width:47%;
+				height:10%;
+				background: #039be58c;
+				bottom: 0;
+				right: 0;
+				transition: all 0.4s ease-in-out;
+			}
+			.zoom_city{
+				position: absolute;
+				width: 60%;
+				height:20%;
+				background: #039be58c;
+				right: 0;
+				bottom: 0;
+				transition: all 0.4s ease-in-out;				
+			}
+			.spillage{
+				width:100%;
+				position: absolute;
+				top:17.5vh;
+
+			}
+			.ReservoirCap{
+				width:100%;
+				position: absolute;
+				top:21.9vh;
+				z-index: 1;
+
+			}
+			.ReservoirCap>p{
+				margin:0;
+				font-family: 'Roboto', sans-serif;
+				margin-right: 1vw;
+				width:7vw; 
+				left: 2vw;
+				position: absolute;
+				text-align: right;
+			}
+			.ReservoirCap>p:nth-child(3){
+				margin: 0;
+			    font-weight: 300;
+			    font-size: 1.5vh;
+			    /* margin-right: 1vw; */
+			    width: 17vh;
+			    left: 3vw;
+			    padding-top: 1vh;
+			    z-index: 1;
+			    height: 6vw;
+			    background: #E0E0E0;
+			    top: 19vh;
+			    position: absolute;
+			    text-align: center;
+			    transform-origin: 0% 0%;
+			    transform: rotate(-90deg);
+
+
+
+			}
+			.ReservoirCap>p:nth-child(1){
+				font-family: 'Roboto', sans-serif;
+			    font-weight: 300;
+			    font-size: 1.5vh;
+    			color: #757575;
+    			top:2.8vh;
+    			z-index: 2
+			}
+			.ReservoirCap>p:nth-child(2){
+				font-family: 'Roboto', sans-serif;
+			    font-weight: 400;
+			    font-size: 0.9vh;
+			    top:4.2vh;
+			    color: #9E9E9E;
+			    z-index: 2
+			}
+			.ReservoirCap>p:nth-child(4){
+				font-family: 'Roboto', sans-serif;
+			    font-weight: 300;
+			    font-size: 1.5vh;
+    			color: #757575;
+    			top:15.8vh;
+    			z-index: 2
+			}
+			.ReservoirCap>p:nth-child(5){
+				font-family: 'Roboto', sans-serif;
+			    font-weight: 400;
+			    font-size: 0.9vh;
+			    top:17.5vh;
+			    color: #9E9E9E;
+			    z-index: 2
+			}
+			.ReservoirCap>hr:nth-child(6){
+				top:16vh;
+			}
+			.spillage>p{
+				margin:0;
+				margin-right: 1vw;
+				width:7vw; 
+				left: 2vw;
+				position: absolute;
+				text-align: right;
+			}
+			.spillage>p:nth-child(1){
+				font-family: 'Roboto', sans-serif;
+			    font-weight: 300;
+			    font-size: 1.5vh;
+    			color: #757575;
+    			top:2vh;
+			}
+			.spillage>p:nth-child(2){
+				font-family: 'Roboto', sans-serif;
+			    font-weight: 400;
+			    font-size: 0.9vh;
+			    top:4.2vh;
+			    color: #9E9E9E;
+			}
+			.spillage>hr,.ReservoirCap>hr{
+				width: 90vw;
+			    position: absolute;
+			    left: 9.5vw;
+			    top: 3vh;
+			   	z-index: 2;
+			    border: 0.5px solid #BDBDBD;
+			}
+			.info{
+				position: absolute;
+			    top: 65%;
+			    left: 41%;
+			    font-family: 'Roboto', sans-serif;
+			    font-weight: 400;
+			    font-size: 1.5vh;
+			    color: #9E9E9E;
+			}
+			.sep{
+				position: absolute;
+			    top: 0;
+			    height: 38vh;
+			    width: 0.5vh;
+			    left: 40vw;
+			    background: white;
+			}
+			.box{
+				position: absolute;
+			    bottom: 3vh;
+			    height: 12vh;
+			    width: 11.5vh;
+			    right: 61vw;
+			    border: 1px dashed white;
+			}
+			.head{
+				position: absolute;
+				font-family: 'Roboto', sans-serif;
+				height: 8vh;
+				top:0;
+				width: 50vw;
+			}
+			.pic{
+				position: absolute;
+				background-image: url("Kerala.png");
+				height: 100%;
+				left: 2vw;
+				top: 2vh;
+				width:10vh;
+				background-size: contain;
+				background-repeat:no-repeat; 
+
+			}
+			.head>p{
+				position: absolute;
+				font-family: 'Roboto', sans-serif;
+				left: 10vw;
+				width: 38vw;
+
+			}
+			.head>p:nth-child(2){
+			    font-weight: 700;
+			    font-size: 2.5vh;
+			    letter-spacing: 0.3vw;
+			    color: #673AB7;
+			}
+			.head>p:nth-child(3){
+				font-weight: 400;
+			    font-size: 1.5vh;
+			    /* text-decoration: dashed; */
+			    letter-spacing: 0.2vw;
+			    color: #757575;
+			    top: 4vh;
+			}
+			.head>p:nth-child(4){
+				font-weight: 300;
+			    font-size: 1vh;
+			    color: #757575;
+			    top: 6.5vh;
+			    letter-spacing: 0.05vw;
+			}
+			.head>hr{
+				position: absolute;
+			    top: 10vh;
+			    width: 200%;
+			    border: 1px solid white;
+			}
+		</style>
+	</head>
+	<body >
+		 
+		<div id="yaxis">
+			
+		</div>
+		<div id="chart"></div>
+		<div class="spillage">
+			<p>Spillage</p><p>in mcm (10<sup>6</sup> m<sup>3</sup>)</p><hr>
+		</div>
+
+		<div class="ReservoirCap">
+			<p>732.43m</p><p>max</p><p>Reservoir Capacity</p><p>694.94m</p><p>MDDL</p><hr><hr>
+		</div>
+		<div class="info">
+			<p>Zoom level <b>20X</b></p>
+		</div>
+		<div class="container">
+			<div class="userValues">
+				<div class="one elem">
+					<p>Max Release:</p><input type="number" name="max_waterRelease" id="max_waterRelease" value="120">
+				</div>
+				<div class="two elem">
+					<p>Drainout Level:</p><input type="number" name="drainoutLevel"
+					id="drainoutLevel" value="10">
+				</div>
+				<div class="three elem">
+					<p>Area Factor:</p><input type="number" name="areaFactor" id="areaFactor" value="30">
+				</div>
+				<button class="btn success elem" value="Submit">Submit</button>
+
+			</div>
+
+		</div>
+		<div class="visual">
+			
+			<div class="sky">
+				<div class="water_dam">
+					<div class="in_dam"></div>
+					<div class="on_ground"></div>
+				</div>
+				<div class="zoom_city"></div>
+				<div class="dam_"></div>
+				<div class="city"></div>
+			</div>
+			<div class="ground"></div>
+			<div class="sep"></div>
+			<div class="box"></div>
+
+		</div>
+		<div class="head">
+			<div class="pic"></div>
+			<p>Kerala Floods</p>
+			<p>IDUKKI Reservoir</p>
+			<p>A simulation to test the flooding in Idukki District based on water release from the reservoir.</p>
+			<hr>
+		</div>
+
+
+		<script>
+
+
+				var chart = d3.select('#chart'),
+		        	
+		        	
+			        width = window.innerWidth,
+			        height = document.body.clientHeight;
+			        
+			    var levs;
+
+			    var areaFactor=$("#areaFactor").val();
+			    var drainoutLevel=$("#drainoutLevel").val();   //in mm (of water from ground)
+			    var maxRelease=$("#max_waterRelease").val();
+
+
+//(Storage)= level(m)+c
+			    var m=52.3403878705,
+			    	c=-36876.8277078	
+			    	gateCapacity= 500,	// outflow capapcity
+			    	minLevel=694.944	// in metre
+			    	idukkiArea=4358000000/areaFactor, //in square metre
+			    	max_levelReduce=maxRelease/m; //(S1-S2)/m
+
+			    
+			    $(".success").click(function(){
+			    	areaFactor=$("#areaFactor").val();
+			    	drainoutLevel=$("#drainoutLevel").val();   //in mm (of water from ground)
+			    	maxRelease=$("#max_waterRelease").val();
+			    	
+			    	idukkiArea=4358000000/areaFactor; //in square metre
+			    	max_levelReduce=maxRelease/m; //(S1-S2)/m
+
+
+
+			    	clear();
+			    	draw();
+
+			    	console.log(maxRelease+","+drainoutLevel+", "+areaFactor);
+			    });
+			    
+							    
+
+
+
+
+//chart styling
+		        chart.style('width',width*0.9)
+			        .style('height',height/2.3)
+			        .style('top',height*0.2);
+			    
+//date formatting
+		        var dates=d3.timeParse("%d-%b-%y");
+				var formatTime_day = d3.timeFormat("%d");
+				var formatTime_Month = d3.timeFormat("%b");
+//scaling the two charts
+				var xScale = d3.scaleBand().range([0,height*2]).padding(0.055),
+
+		       		yScale = d3.scaleLinear().range([0, height/20]);
+		       		yScale3 = d3.scaleLinear().range([height/20, 0]);
+		    	var xScale2 = d3.scaleBand().range([0,height*2]).padding(0.055),
+		        	yScale2 = d3.scaleLinear().range([height/5,height/3]);
+//reading dat from csv
+
+
+function draw(){
+				
+				var yaxis = d3.select("#yaxis");
+					yaxis.append("svg");
+				var	ysvg =d3.select("#yaxis>svg");
+
+				
+				yaxis.style('width',width*0.1)
+			    	.style('height',height/2.3)
+			    	.style('top',height*0.2);
+			    ysvg.attr('width',width*0.2)
+		        	.attr('height',height/2.5)
+		        	.attr("transform", "translate("+width*0.05+","+(height/3-height/15)+")");
+				
+				d3.csv("Data.csv", function(error, data) {
+		        if (error) {      throw error;	        }
+
+//passing values to other variable
+		       /* data.forEach(function(d){
+		       		levs=data;
+		       	});
+				*/
+		       	levs = jQuery.extend(true, {}, data);
+
+		        xScale.domain(data.map(function(d) {  return dates(d.date); }));
+
+		        yScale.domain([0,d3.max(data, function(d) { return d.rain; })*4]);
+		        yScale3.domain([0,d3.max(data, function(d) { return d.rain; })*4]);
+		        
+
+				xScale2.domain(data.map(function(d) {  return dates(d.date); }));
+		        yScale2.domain([718, d3.max(data, function(d) { return d.level; })]);
+		        //yScale2.domain([710, d3.max(data, function(d) { return d.level; })]);
+
+//ghost dam bars
+
+				chart.append("div")
+					.attr("class","ghostDam")
+					.selectAll(".bar2")
+					.data(data)
+					.enter().append("div")
+							.attr("class","bar0")
+							.style("width",xScale.bandwidth()-2+"px")
+							.style("height",function(d){return yScale2(d.level);});
+
+
+
+//Dam bars
+				chart.append("div")
+					 .attr("class","dam")
+					 .selectAll(".bar2")
+			         .data(data)
+			         .enter().append("div")
+				         .attr("class", "bar2")
+				         //.attr("x", function(d) { return xScale2(dates(d.date)); })
+				         //.attr("y", function(d) { return yScale2(d.level); })
+				         .style("width", xScale.bandwidth())
+				         //.style("transform", "translate(0," + 0.22*height+ ")")
+				         .style("height", function(d) {  return yScale2(d.level); })
+				         .on("mouseover", mouseon)
+			         	 .on("mouseout", mouseoff)
+// data circles		
+		//circle
+		         	 /*.append("div")
+			         	 .attr("class","circle")
+			         	 .attr("id","circle")
+			         	 .style("width",height*0.015)
+			         	 .style("height",height*0.015)
+			         	 .style("background","white")
+			         	 .style("position","relative")
+			         	 .style("border-radius","50%")
+			         	 .style("transform","translateY(-50%)")
+			         	 .style("left",xScale.bandwidth()/2-height*0.0075)*/
+		//slider         	
+		         	
+		         	.append("input")
+		         	 	.attr("id","myRange")
+		         	 	.attr("data-var","lvl")
+		         	 	.attr("class","slider")
+		         	 	.attr("min",function(d){return d.level-max_levelReduce;})
+		         	 	.attr("max",function(d){ return d.level;})
+		         	 	.attr("value",function(d){ sliderMove(this,d.level); return d.level;})
+		         	 	.attr("type","range")
+		         	 	.attr("step","0.1")
+		         	 	.style("font-size",height*0.002+"px")
+		         	 
+		         	/* .append("span")
+		         	 	.attr("id","levels")
+		         	 	.attr("data-var","lvl")
+		         	 	.attr("class","TKAdjustableNumber")
+		         	 	.attr("data-min",function(d){return Math.round(d.level-gateCapacity);})
+		         	 	.attr("data-max",function(d){ setUpTangle(this, Math.round(d.level)); return Math.round(d.level);})
+		         	 	.style("font-size",height*0.002+"px");
+		         	 	//.text(function(d){return d3.format(".1f")(d.level)});
+					*/
+		         	 
+		         
+			         
+	//rain Bars
+			    chart.selectAll(".bar")
+			         .data(data)
+			         .enter().append("div")
+				         .attr("class", "bar")
+				         //.attr("x", function(d) { return xScale(dates(d.date)); })
+				         //.attr("y", function(d) { return yScale(d.rain); })
+				         .style("width", xScale.bandwidth())
+				         .style("height", function(d) {  return yScale(d.rain); })
+				         .on("mouseover", mouseon)
+			         	 .on("mouseout", mouseoff)
+			         	 .append("div")
+							.attr("class","bar3")
+							.style("width", xScale.bandwidth())
+							.style("height", function(d) { return yScale(waterLevel_BSpill(idukkiArea,d.spill));});
+
+// spill values  
+				chart.append("div")
+					.attr("class","spillVal")
+					.selectAll("spillVal")
+					.data(data)
+					.enter().append("div")
+						.attr("class","value")
+						.text(function(d){
+							if(d.spill!=0)
+							return d.spill;
+							else
+							return " ";
+						})
+						.style("width",xScale.bandwidth());
+//level values
+
+
+
+//axis			
+		//yaxis		
+				ysvg.append("g")
+			         .attr("transform", "translate("+width*0.045+","+height*0.06+")")
+			         .attr("text-anchor", "end")
+			         .call(d3.axisLeft(yScale3)
+			         	.tickFormat(function(d){
+		         	
+		         	return d;
+			         })
+			         .ticks(5))
+			         .append("text")
+			         .attr("transform", "rotate(-90)")
+			         .attr("y", 16)
+			         .attr("dy", "1px")
+			         .attr("text-anchor", "end")
+			         .attr("stroke", "black");
+			         //.text("rains");
+		//xaxis     
+			    chart.append("svg")
+			    	 .attr("width",$('.dam').outerWidth())
+			    	 .attr("height",height/40)
+			    	 .style("top",height/2.5-height/45)
+			    	 .style("left","0")
+			    	 .style("position","absolute")
+			    	 .append("g")
+			         .attr("class", "x-axis-day")
+			         .attr("text-anchor", "end")
+			         .call(d3.axisBottom(xScale).tickArguments(["y2","3"])
+			         	.tickFormat(function(d){
+		         	
+		         	return formatTime_day(d);
+		         	}));
+		//month
+			    chart.append("svg")
+			         .attr("transform", "translate(0," + height*0.61 + ")")
+			         .attr("class", "x-axis-mon")
+			         .attr("text-anchor", "end")
+			         .attr("width",$('.dam').outerWidth())
+			    	 .attr("height",height/40)
+			    	 .style("top","-51%")
+			    	 .style("left","0")
+			    	 .style("position","absolute")
+			         .call(d3.axisBottom(xScale).ticks(10)
+			         	.tickFormat(function(d){
+			         	
+			         	return formatTime_Month(d);
+		         }));
+
+
+//update The chart
+				function updateChart(abc, value){
+						
+					$(abc.parentElement).mouseup(function(){
+						d3.select(abc.parentElement)
+							.style("height",yScale2(value));
+					});
+						
+						
+						//selection.data(levs);
+
+
+							
+		         			//.style("","demo");	
+				}
+				function sliderMove(abc, value){
+						
+						d3.select(abc.parentElement)
+							.append("span")
+							.attr("id","demo")
+							.style("top","0")
+							.style("transform","translateY(-100%)")
+							.text(function(d){return d3.format(".2f")(value);});
+						//var output = document.getElementById("demo");
+			            //	output.innerHTML = slider.value;
+
+			            abc.oninput = function() {
+			              	var num=this.value;
+			              	var index=$(abc).parent().index();
+			              	levs[index].level=num;
+			              	var spill;
+			              	d3.select(abc.parentElement)
+			              		.select("span")
+			              		.text(Math.round(num));
+			              	
+			              		updateChart(abc, Math.round(num)); //update height;
+			              	
+
+			              	d3.select(".value:nth-child("+(index+1)+")")
+			              		.text(function(){
+
+			              			Final_Spill(index,num)
+			              			return parseInt(levs[index].spill);
+			              		})
+			              		
+
+			            }
+	        	}
+
+//water level on ground
+	        	
+
+	        	function Final_Spill(index, new_level)
+	        	{		
+	        	//storing old values		
+	        			var old_spill=data[index].spill;
+	        			var old_level=data[index].level;
+	        			var old_storage=data[index].storage;
+
+	        	//calculate new values		
+	        			
+	        			var new_storage=new_level*m+c;
+						var levelChange=old_level-new_level;
+	        			var extra_spill=old_storage-new_storage;
+	        			var tot_spill=(parseFloat(old_spill)+parseFloat(extra_spill))
+	        				if(tot_spill<0){tot_spill=0;}
+	        			
+	        	//perform actions			
+	        			for(i=index+1,j=0; i<Object.keys(data).length-1;i++,j++ )
+						{	
+							change_DamLvl(i, levelChange);
+							waterLevel_onGround(i, drainage(j,tot_spill));
+
+						}	
+
+
+
+	        	//update the table		
+	        			delete levs[index].spill;
+	        			levs[index].spill=tot_spill;
+	        			
+	        			delete levs[index].storage;
+	        			levs[index].storage=(new_storage);
+	        			//console.log(levs[index]);
+	        			
+	        			
+// reduce further levels
+						
+
+
+					
+
+	        	}
+	        	function change_DamLvl(i, change){
+	        			levs[i].level=data[i].level-change;
+	        			d3.select(".bar2:nth-child("+(i+1)+")")
+	        			  .style("height",yScale2(levs[i].level))
+	        			  .select("input")
+			         	 	.attr("min",function(){return levs[i].level-max_levelReduce;})
+			         	 	.attr("max",function(){ return levs[i].level;})
+			         	 	.attr("value",function(){ return levs[i].level;});
+			         	 
+			         	 //data[i].level=data[i].level-change;
+			         	 	
+	        	}
+
+	        	function drainage(j,spill)
+	        	{	
+	        		var fnl=spill-j*drainoutLevel;
+	        		if(fnl>0)
+	        		return fnl;
+	        		else
+	        		return 0;
+	        	}
+
+	        	function waterLevel_onGround(i,spill){
+	        			var tot_spill=parseFloat(levs[i].spill)+parseFloat(spill);
+	        		//add the excess water to next day after subtracting outflowLevel
+	        			d3.select(".bar:nth-child("+(i+3)+")>.bar3")
+	        				.style("height", function() { return yScale(waterLevel_BSpill(idukkiArea,tot_spill));});
+
+	        	}
+
+
+
+
+
+
+//csv limit ends
+			        });
+
+				function waterLevel_BSpill(area, totalSpill){
+	        		//console.log(totalSpill*1000000/area*1000);
+	        		//console.log((totalSpill*1000000/area*1000));
+	        		console.log(area);
+	        		return (totalSpill*1000000/area*1000);
+
+	        	}
+
+				function mouseon()
+				{
+		         	var idx=$(this).index();
+		         	//console.log(this.getAttribute('class'));
+		         	if(this.getAttribute('class')=='bar2')
+		         	{
+		         		d3.select(this)
+				         		.style("border-top","2px solid #e91e63")
+				         		.select('.circle')
+				         		.style("width",height*0.04)
+			         	 		.style("height",height*0.04)
+			         	 		.style("opacity","0.9")
+			         	 		.style("left",xScale.bandwidth()/2-height*0.02)
+		         	 		.select("span")
+		         	 			.style("font-size",height*0.013+"px");
+			         	
+			         	d3.select(".bar:nth-child("+(idx+3)+")")
+			         		.style("border-bottom","2px solid #e91e63");
+
+			    
+		         	}else
+		         	{
+		         		d3.select(this)
+			         		.style("border-bottom","2px solid #e91e63");
+			         	
+			         	d3.select(".bar2:nth-child("+(idx-1)+")")
+				         		.style("border-top","2px solid #e91e63")
+				         		.select('.circle')
+				         		.style("width",height*0.04)
+			         	 		.style("height",height*0.04)
+			         	 		.style("opacity","0.9")
+			         	 		.style("left",xScale.bandwidth()/2-height*0.02)
+		         	 		.select("span")
+		         	 			.style("font-size",height*0.013+"px");
+
+		         	}
+
+		         	console.log("rain:"+levs[idx].rain+", spill: "+waterLevel_BSpill(idukkiArea,parseFloat(levs[idx].spill)));
+
+
+		         	$(".in_dam").css("height",levs[idx].level*(86/732.43)+"%");
+		         	$(".in_dam").css("height",levs[idx].level*(86/732.43)+"%");
+		         	$(".on_ground").css("height",(waterLevel_BSpill(idukkiArea,parseFloat(levs[idx].spill))+parseFloat(levs[idx].rain))*(86/732.43)*0.001+"%");
+		         	$(".zoom_city").css("height",(waterLevel_BSpill(idukkiArea,parseFloat(levs[idx].spill)+parseFloat(levs[idx].rain))*(86/732.43)*0.001)*(4.3/0.21135125541)+"%");
+		         	
+
+		         	var posx=d3.format(".1f")(d3.select(this).attr('x'));
+		         	var barwidth=d3.format(".1f")(d3.select(".bar").attr('width'));
+		         	//var posy=d3.select('.back_cover').
+		         	
+		         	
+		         	
+		        }
+
+
+		        function mouseoff()
+		        {
+		         	var idx=$(this).index();
+		         	//console.log(this.getAttribute('class'));
+		         	if(this.getAttribute('class')=='bar2')
+		         	{
+		         		d3.select(this)
+				         		.style("border", "none")
+				         		.select('.circle')
+				         		.style("width",height*0.015)
+			         	 		.style("height",height*0.015)
+			         	 		.style("opacity","0.5")
+			         	 		.style("left",xScale.bandwidth()/2-height*0.0075)
+	         	 			.select("span")
+		         	 			.style("font-size",height*0.002+"px");
+		         		d3.select(".bar:nth-child("+(idx+3)+")")
+		         		.style("border","none");
+
+		         	}
+		         	else
+		         	{
+		         		d3.select(this)
+		         		.style("border", "none");
+		         		d3.select(".bar2:nth-child("+(idx-1)+")")
+				         		.style("border","none")
+				         		.select('.circle')
+				         		.style("width",height*0.015)
+			         	 		.style("height",height*0.015)
+			         	 		.style("opacity","0.5")
+			         	 		.style("left",xScale.bandwidth()/2-height*0.0075)
+			         	 	.select("span")
+		         	 			.style("font-size",height*0.002+"px");;
+		         	}	
+
+		         	$(".on_ground").css("width",($(".dam_").height()*(287/400))*0.85+"px");
+			 	 	$(".in_dam").css("width",$(".water_dam").outerWidth()-$(".on_ground").outerWidth()+"px");
+			   		$(".in_dam").css("height",86*(694.944/732.43)+"%");
+			   		$(".on_ground").css("height",0.01+"%");
+			   		$(".zoom_city").css("height",0.01+"%");
+		    
+		         }
+}
+
+function clear()
+{
+		d3.selectAll(".bar").remove();
+		d3.selectAll(".bar2").remove();
+		d3.selectAll(".bar3").remove();
+		d3.selectAll(".bar0").remove();
+		d3.selectAll(".ghostDam").remove();
+		d3.selectAll(".dam").remove();
+		d3.selectAll(".spillVal").remove();
+		d3.selectAll("svg").remove();
+
+
+
+}
+
+		       
+
+		         
+
+		</script>
+		<script>
+			$(document).ready(function () {
+			    $('#chart').mousewheel(function(e, delta) {
+			        this.scrollLeft -= (delta /2);
+			        e.preventDefault();
+			    });
+			    
+			    draw();
+
+			    $(".on_ground").css("width",($(".dam_").height()*(287/400))*0.85+"px");
+			    $(".in_dam").css("width",$(".water_dam").outerWidth()-($(".dam_").height()*(287/400))*0.85+"px");
+			    $(".in_dam").css("height",86*(694.944/732.43)+"%");
+			    $(".on_ground").css("height",0.01+"%");
+			    $(".zoom_city").css("height",0.01+"%");
+
+
+			    });
+			
+		</script>
+		
+	</body>
+</html>
