@@ -469,6 +469,7 @@
 				width:10vh;
 				background-size: contain;
 				background-repeat:no-repeat; 
+				background-position: right bottom;
 
 			}
 			.head>p{
@@ -603,7 +604,7 @@
 			    	clear();
 			    	draw();
 
-			    	console.log(maxRelease+","+drainoutLevel+", "+areaFactor);
+			    	
 			    });
 			    
 							    
@@ -920,6 +921,9 @@ function draw(){
 			         	 	.attr("min",function(){return levs[i].level-max_levelReduce;})
 			         	 	.attr("max",function(){ return levs[i].level;})
 			         	 	.attr("value",function(){ return levs[i].level;});
+			         	d3.select(".bar2:nth-child("+(i+1)+")") 	
+			         	  .select("#demo")
+			         	   	.text(d3.format('.2f')(levs[i].level));
 			         	 
 			         	 //data[i].level=data[i].level-change;
 			         	 	
@@ -935,7 +939,8 @@ function draw(){
 	        	}
 
 	        	function waterLevel_onGround(i,spill){
-	        			var tot_spill=parseFloat(levs[i].spill)+parseFloat(spill);
+	        			var tot_spill=parseFloat(data[i].spill)+parseFloat(spill);
+	        			levs[i].spill=tot_spill;
 	        		//add the excess water to next day after subtracting outflowLevel
 	        			d3.select(".bar:nth-child("+(i+3)+")>.bar3")
 	        				.style("height", function() { return yScale(waterLevel_BSpill(idukkiArea,tot_spill));});
@@ -944,21 +949,17 @@ function draw(){
 
 
 
+	        	
 
-
-
-//csv limit ends
-			        });
-
-				function waterLevel_BSpill(area, totalSpill){
+	        	function waterLevel_BSpill(area, totalSpill){
 	        		//console.log(totalSpill*1000000/area*1000);
 	        		//console.log((totalSpill*1000000/area*1000));
-	        		console.log(area);
+	        		
 	        		return (totalSpill*1000000/area*1000);
 
 	        	}
 
-				function mouseon()
+				function mouseon(sp)
 				{
 		         	var idx=$(this).index();
 		         	//console.log(this.getAttribute('class'));
@@ -995,7 +996,7 @@ function draw(){
 
 		         	}
 
-		         	console.log("rain:"+levs[idx].rain+", spill: "+waterLevel_BSpill(idukkiArea,parseFloat(levs[idx].spill)));
+		         	console.log("levs: "+levs[idx].spill+"data: "+data[idx].spill);
 
 
 		         	$(".in_dam").css("height",levs[idx].level*(86/732.43)+"%");
@@ -1054,6 +1055,16 @@ function draw(){
 			   		$(".zoom_city").css("height",0.01+"%");
 		    
 		         }
+
+
+
+
+
+
+//csv limit ends
+			        });
+
+				
 }
 
 function clear()
