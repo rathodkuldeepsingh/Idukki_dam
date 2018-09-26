@@ -74,7 +74,7 @@
 				transform:translateY(1px); 
 			}
 			#yaxis{
-				
+				z-index: 1;
 				position: absolute;
 				
 				
@@ -506,6 +506,97 @@
 			    width: 200%;
 			    border: 1px solid white;
 			}
+
+			.waterOnGround{
+			    width: 100%;
+			    position: absolute;
+			    top: 38.9vh;
+			    z-index: 0;
+				
+			}
+			.waterOnGround>p:nth-child(1){
+				margin: 0;
+			    font-weight: 300;
+			    font-size: 1.5vh;
+			    /* margin-right: 1vw; */
+			    width: 14vh;
+			    left: 3vw;
+			    padding-top: 1vh;
+			    z-index: 0;
+			    height: 6vw;
+			    background: #E0E0E0;
+			    top: 19vh;
+			    position: absolute;
+			    text-align: center;
+			    transform-origin: 0% 0%;
+			    transform: rotate(-90deg);
+			}
+			.waterOnGround>p:nth-child(2){
+				position: absolute;
+				font-family: 'Roboto', sans-serif;
+			    font-weight: 300;
+			    font-size: 1vh;
+			    color: #757575;
+			    width: 14vh;
+			    top: 8.5vh;
+			    left: 0.5vw;
+			    padding-top: 1vh;
+			    z-index: 2;
+			    transform: rotate(-90deg);
+			}
+			.waterOnGround>p{
+				font-family: 'Roboto', sans-serif;
+    			margin-right: 1vw;
+			}
+			.legend{
+				width:7vw;
+				left: 3vw;
+				position: absolute;
+			    top: 45vh;
+			    z-index: 2;
+			}
+			.ele{
+				width:100%;
+				position: relative;
+				display: inline-block;
+				margin-left: 2vw;
+
+			}
+			.ele>.sq{
+				width:0.5vw;
+				height: 0.5vw;
+				float: left;
+				margin-right: 0.2vw;
+			}
+			.ele:nth-child(1)>.sq{
+				background:#2195f3;
+			}
+			.ele:nth-child(2)>.sq{
+				background:#f37820;
+			}
+			.ele>.txt{
+				width:80%;
+				font-family: 'Roboto', sans-serif;
+				height: 100%;
+				float: left;
+				font-size: 1vh;
+			}
+			.help{
+				position: absolute;
+				top:12vh;
+				font-family: 'Roboto', sans-serif;
+				font-size: 1.2vh;
+				left:10vw;
+			}
+			.help>p{
+				margin:0;
+				margin-bottom: 0.2vh;
+				color:#9E9E9E;
+			}
+			.help>p:nth-child(1){
+				font-size: 1.8vh;
+				color:#757575;
+			}
 		</style>
 	</head>
 	<body >
@@ -564,7 +655,26 @@
 			<p>A simulation to test the flooding in Idukki District based on water release from the reservoir.</p>
 			<hr>
 		</div>
-
+		<div class="legend">
+			<div class="ele">
+				<div class="sq"></div>
+				<div class="txt">Rainfall</div>
+			</div>
+			<div class="ele">
+				<div class="sq"></div>
+				<div class="txt">Dam spillage</div>
+			</div>
+		</div>
+		<div class="waterOnGround">
+			<p>Water on Ground</p>
+			<p>(in mm)</p>
+		</div>
+		<div class="help">
+			<p>Instructions</p>
+			<p>* Use your mouse scroll wheel on the bar chart to scroll left.</p>
+			<p>* Hover over each bar to see actual water level on the scaled graphic below</p>
+			<p>* Slide the green slider to release water from the reservoir on a particular day</p>
+		</div>
 
 		<script>
 
